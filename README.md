@@ -64,12 +64,13 @@ the low 118 bits should represent Bob's secret key.
 
 ## Security
 
-For any public key `b`, and any chosen `r` and `p` values, there exist `v`
-array values that satisfy `b[i] = r*v[i] mod p`, if we let the `v` values be
-any value in [0..p-1].  Therefore, if v had no constraints, the `b` array would
-leak no information about `r` and `p`.
+For any public key `b`, and any attacker-chosen `r` and `p` values, there exist
+`v` array values that satisfy `b[i] = r*v[i] mod p`, if we let the `v` values
+be any value in [1..p-1].  Therefore, if v had no constraints, the `b` array
+would leak no information about `r` and `p`.
 
-However, v has significant structure.  It is, for example possible to eliminate both `r` and `v[i]` from the set of equations with some tricks:
+However, v has significant structure.  It is, for example possible to eliminate
+both `r` and `v[i]` from the set of equations with some tricks:
 
 ```
     r*v[i] mod p = (r/(2^118))*(2^118*v[i] mod p
@@ -89,7 +90,8 @@ the range [0..p-1].  For every possible `p mod 2^118`, there is a possible
 `k[i] mod 2^118` s.t `b[i] = k[i]\*p mod 2^118`.  Therefore, the attacker does
 not directly learn anything about the lower 118 bits of `p`.
 
-Are there more sophisticated attacks that leak some or all of `p`?  Maybe.
+Are there more sophisticated attacks that leak some or all of `p`?  Probably.
+I just can't find one.
 
 If classically secure, is this scheme quantum resistant?  I am unfortunately
 not skilled in this area, but I will hypothesize that it might be.  Someone
