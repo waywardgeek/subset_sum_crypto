@@ -50,14 +50,9 @@ This prevents the `b` values from leaking information about `p`.  The array `b`
 is Alice's public key, which is 16KiB.  The values `r`, `p`, and array `v` are
 Alice's private key.
 
-Is this blinding cryptographically secure?  This crypto system is completely
-broken if an attacker finds `r` and `p`.  Without knowing `r` and `p`, can
-the attacker guess the lower bits of a subset-sum of the `v` values?  The
-hypothesis for this crypto system is that this problem is hard.
-
-For Bob to send Alice a 128-bit shared secret, he encodes it by summing the
-corresponding values in `b[0..127]`, and obfuscates the sum by picking randomly
-elements from `b[128..511]`.  Bob sends the resulting sum `s` to Alice.
+For Bob to send Alice a 118-bit shared secret, he encodes it by summing the
+corresponding values in `b[0..117]`, and obfuscates the sum by picking randomly
+elements from `b[118..511]`.  Bob sends the resulting sum `s` to Alice.
 
 Alice then computes
 
