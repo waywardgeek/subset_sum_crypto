@@ -16,10 +16,10 @@ print("r =", r)
 
 def findVAndB(i):
     while True:
-        if i < 128:
-            v = (randrange(1 << 118) << 128) | (1 << i)
+        if i < 118:
+            v = (randrange(1 << 128) << 118) | (1 << i)
         else:
-            v = randrange(1 << 118) << 128
+            v = randrange(1 << 128) << 118
         b = r*v % p
         if b < (1 << 256):
             return (v, b)
@@ -31,13 +31,13 @@ for i in range(512):
     v.append(pair[0])
     b.append(pair[1])
 
-bobSecret = randrange(1 << 128)
+bobSecret = randrange(1 << 118)
 print("Bob's secret =", bobSecret)
 s = 0
-for i in range(128):
+for i in range(118):
     if (bobSecret >> i) & 1 == 1:
         s += b[i]
-for i in range(128, 512):
+for i in range(118, 512):
     if randrange(2) == 1:
         s += b[i]
 print("Bob returns", s)
@@ -45,7 +45,7 @@ print("Bob returns", s)
 # This computes the modular inverse of r mod p.
 rInv = pow(r, -1, p)
 print("rInv =", rInv)
-aliceSecret = ((1 << 128) - 1) & (((s % p) * rInv) % p)
+aliceSecret = ((1 << 118) - 1) & (((s % p) * rInv) % p)
 print("aliceSecret =", aliceSecret)
 if aliceSecret == bobSecret:
       print("Passed")
