@@ -1,7 +1,7 @@
 # A new crypto system I just made up.  Is it secure?  Quantum resistant?
 
-Alice then picks random secret 256-bit prime `p` in the range [2^256..2^257],
-and then computes 128 values `v[i]`, for `i` in [0..127]:
+Alice starts by picking random secret 256-bit prime `p` in the range
+[2^256..2^257], and then computes 128 values `v[i]`, for `i` in [0..127]:
 
 ```
     v[i] = (randrange(2^118) << 128) | (1 << i)
