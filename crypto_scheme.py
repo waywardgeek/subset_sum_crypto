@@ -11,8 +11,8 @@ min_range = 1 << 256
 max_range = 1 << 257
 p = get_random_prime(min_range, max_range)
 r = randrange(1 << 256)
-print(f"p = {p}")
-print(f"r = {r}")
+print("p =", p)
+print("r =", r)
 
 def findVAndB(i):
     while True:

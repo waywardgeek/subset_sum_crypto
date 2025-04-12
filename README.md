@@ -1,61 +1,74 @@
-Alice picks 128 values, for i in [0..127]:
+# A new crypto system I just made up.  Is it secure?  Quantum resistant?
 
-    v[i] = (randRange(2^118) << 128) | (1 << i)
+Alice then picks random secret 256-bit prime `p` in the range [2^256..2^257],
+and then computes 128 values `v[i]`, for `i` in [0..127]:
 
-That is 118 random upper bits, but only one unique bit set in the lower bits.
-Alice also picks
+```
+    v[i] = (randrange(2^118) << 128) | (1 << i)
+```
 
-    v[128 .. 512] = randRange(2^118) << 128
+Remember that the << operator means shift the bits left.  `1 << i` is the value
+`2^i`.
 
-where all 128 lower bits are 0.  All the values of v added together are still < p.
+The upper 128 bits start with 10 leading 0's, followed by 118 118 random bits.
+The lower 128 bits have only the `i`th bit set.  When any subset of the array
+`v` are added together, the lower 128 bits encode which elements of `v` were
+chosen, making the subset-sum problem trivial.  Just to make it easier, note
+that all of these values added together are < `p`, so we can compute the same sum mod `p`.
 
-Alice then picks random 256-bit r and prime p in the range of 2^256 to 2^257,
-and computes
+The main idea for this crypto system is for Alice to publish values based on
+the array `v` as her public key, and for Bob to transmit to Alice a shared
+128-bit key encoded in a subset-sum.  Obviously, simply publishing the array
+`v` is insecure, so we need to somehow obfuscate `v`'s values.
 
+First, let's make the subset-sum problem more interesting, expanding the array
+`v` from 128 elements to 512.  For `i` in [128..511], Alice computes:
+
+```
+    v[i] = randrange(2^118) << 128
+    ```
+
+These values have 0's for both the leading 10 bits and the lower 128 bits.
+Note that a random subset-sum of `v` encodes only which of the values where
+chosen in `v[0..127]`.  Also, there are very many solutions to the subset-sum
+problem, around 2^256 when the target `T` is a random subset-sum of `v`.
+
+To obscure the values of the array `v`, Alice picks a random 256-bit value
+called `r` in [1..p-1], and computes a blinded array `b` for `i` in [0..511]:
+
+```
     b[i] = r*v[i] mod p
+```
 
-For any b[i] > 2^256, Alice picks a new b[i] until all b[i] < 2^256.  The set
-of b[i] is Alice's public key, which is 16KiB.  The values r, v[i], and p are
-Alice's secret key.
+For any `b[i]` > 2^256, Alice picks a new `v[i]` until all `b[i]` < 2^256.
+This prevents the `b` values from leaking information about `p`.  The array `b`
+is Alice's public key, which is 16KiB.  The values `r`, `p`, and array `v` are
+Alice's private key.
 
-Note that Bob knows that b[0] to b[127] represent bits of the shared key.  Bob
-picks a random 128-bit key, and sums the corresponding b[i] together where i <
-128.  Bob then further obfuscates the sumb by adding a random subset of the
-remaining b[128..512].  Bob sends the resulting sum s to Alice.
+Is this blinding cryptographicallyy secure?  This crypto system is completely
+broken if an attacker finds ``r`` and ``p`.  Without knowing `r` and `p`, can
+the attacker guess the lower bits of a subset-sum of the `v` values?  The
+hypothesis for this crypto system is that this problem is hard.
+
+For Bob to send Alice a 128-bit shared secret, he encodes it by summing the
+corresponding values in `b[0..127]`, and obfuscates the sum by picking randomly
+elements from `b[128..511]`.  Bob sends the resulting sum `s` to Alice.
 
 Alice then computes
 
-    key = lower128Bits((s mod p) / r mod p)
+    sharedSecret = lower128Bits(s/r mod p)
 
-This can be seen as valid noting that s/r mod p = sum(v[i]), where i was
-selected by Bob.  This sum < p, so the low 128 bits shoulud represent Bob's
-secret key.
+This can be seen as valid noting that `s/r mod p = sum(v[i])`, where the `i`
+values were selected by Bob to encode `sharedSecret`.  This sum is < `p`, so
+the low 128 bits shoulud represent Bob's secret key.
 
-Subset-sum problem can be solved in ~O(2^(n/4)), where n is the number of
-integers being summed.  However, we have ~2^256 solutions, so maybe one can be
-found quickly.  However, only 1 in 2^128 solutions is valid, in that it gives
-Bob's secret key.
+Is this scheme quantum resistant?  I am unfortunately not skilled in this area,
+but I will hypothesize that it might be.  Someone else would need to determine
+this.
 
-The other attack is to try to compute p and r from the 512 values.  Brute force
-guessing p clearly won't be fast enough.
-
-Trying to guess r from the 512 values without knowing p:
-
-    b[0] = r*v[0] + k[0]p -- 2 256-bit unknowns and 1 128-bit unknown (k can be dreived)
-    b[1] = r*v[1] + k[1]p -- An additional 128 bit unknown.
-    ...
-
-Hypothesis: finding r and p from these 512 equations is hard.  Intuition is
-that without knowing p, this is a group of unknown order, and the attacker
-loses the ability to find modular inverses.
-
-Quantum resistance, assuming BQP != NP: The subsest-sum problem is NP-hard, so
-unless a special version of a quantum algorithm can be found to solve this
-specific case, I think the best we can do is Grover's algorithm.  With Grovers
+However, assuming BQP != NP: The subsest-sum problem is NP-hard, so unless a
+special version of a quantum algorithm can be found to solve this specific
+case, I think the best we can do is Grover's algorithm.  With Grovers
 algorithm, we want to find r and p that simultaneouisly solves a few of the
-B[i] = r\*v[i] mod p constraints.  Both r and p are 256 bits long, so Grovers
-algorithm would take 2^256 time.
-
-There is a year-old paper that claims BQP == NP, which would be a tremendous
-result if true.  In that case, there is no such thing as post-quantum crypto.
-However, it hasn't been talked about much, most likely meaning it is wrong.
+`b[i] = r*v[i] mod p` constraints.  Both `r` and `p` are at least 256 bits
+long, so Grovers algorithm would take 2^256 time.
