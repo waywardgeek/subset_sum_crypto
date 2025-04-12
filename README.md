@@ -61,15 +61,16 @@ Alice then computes
 
 This can be seen as valid noting that `s/r mod p = sum(v[i])`, where the `i`
 values were selected by Bob to encode `sharedSecret`.  This sum is < `p`, so
-the low 128 bits shoulud represent Bob's secret key.
+the low 128 bits should represent Bob's secret key.
 
 Is this scheme quantum resistant?  I am unfortunately not skilled in this area,
 but I will hypothesize that it might be.  Someone else would need to determine
 this.
 
-However, assuming BQP != NP: The subsest-sum problem is NP-hard, so unless a
-special version of a quantum algorithm can be found to solve this specific
-case, I think the best we can do is Grover's algorithm.  With Grovers
-algorithm, we want to find r and p that simultaneouisly solves a few of the
-`b[i] = r*v[i] mod p` constraints.  Both `r` and `p` are at least 256 bits
-long, so Grovers algorithm would take 2^256 time.
+With very many solutions to the subset-sum problem, even a quantum computing
+solution to subset-sum does not break the scheme directly.  The attacker would
+need to find not just the subset, but also `r` and `p` to verify the subset sum
+is correct.  There may be quantum computing algorithms that work more
+efficiently, but the one I know is Grover's Algorithm, which is not fast
+enough, since guessing both `r` and `p` at the same time would take time
+O(2^256).
