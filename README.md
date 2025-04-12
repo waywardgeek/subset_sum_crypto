@@ -10,7 +10,7 @@ Alice also picks
 where all 128 lower bits are 0.  All the values of v added together are still < p.
 
 Alice then picks random 256-bit r and prime p in the range of 2^256 to 2^257,
-and cmoputes
+and computes
 
     b[i] = r*v[i] mod p
 
