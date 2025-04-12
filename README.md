@@ -110,5 +110,4 @@ As for the subset-sum problem, the best known general attacks where each
 element is more than 512 bits is around `O(n/4)`, where `n` is the number of
 elements in the set.  This algorithm makes it strictly harder to find a correct
 subset of elements by shortening values, giving the attacker less information.
-
-I suspect this is where the weakness in the algorithm lies.
+Attacks directly on Bob's message to Alice are unlikely to work out.
