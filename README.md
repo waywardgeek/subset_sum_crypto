@@ -27,7 +27,7 @@ First, let's make the subset-sum problem more interesting, expanding the array
 
 ```
     v[i] = randrange(2^118) << 128
-    ```
+```
 
 These values have 0's for both the leading 10 bits and the lower 128 bits.
 Note that a random subset-sum of `v` encodes only which of the values where
