@@ -10,11 +10,12 @@ Alice starts by picking random secret 256-bit prime `p` in the range
 Remember that the << operator means shift the bits left.  `1 << i` is the value
 `2^i`.
 
-The upper 128 bits start with 10 leading 0's, followed by 118 118 random bits.
-The lower 128 bits have only the `i`th bit set.  When any subset of the array
-`v` are added together, the lower 128 bits encode which elements of `v` were
+The upper 128 bits start with 10 leading 0's, followed by 118 random bits.  The
+lower 128 bits have only the `i`th bit set.  When any subset of the array `v`
+are added together, the lower 128 bits encode which elements of `v` were
 chosen, making the subset-sum problem trivial.  Just to make it easier, note
-that all of these values added together are < `p`, so we can compute the same sum mod `p`.
+that all of these values added together are < `p`, so we can compute the same
+sum mod `p`.
 
 The main idea for this crypto system is for Alice to publish values based on
 the array `v` as her public key, and for Bob to transmit to Alice a shared
