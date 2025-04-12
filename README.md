@@ -47,7 +47,7 @@ is Alice's public key, which is 16KiB.  The values `r`, `p`, and array `v` are
 Alice's private key.
 
 Is this blinding cryptographically secure?  This crypto system is completely
-broken if an attacker finds ``r`` and ``p`.  Without knowing `r` and `p`, can
+broken if an attacker finds `r` and `p`.  Without knowing `r` and `p`, can
 the attacker guess the lower bits of a subset-sum of the `v` values?  The
 hypothesis for this crypto system is that this problem is hard.
 
