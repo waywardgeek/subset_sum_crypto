@@ -85,9 +85,9 @@ Note that the upper 118 bits of v'[i] are 0 when i > 118.  For i in [116..511]:
     b[i] mod 2^118 = k[i]*p mod 2^118
 ```
 
-Here, `k[i]\*p` is a negative value that reduces `r'\*v'[i] + k[i]\*p` to be in
+Here, `k[i]*p` is a negative value that reduces `r'*v'[i] + k[i]*p` to be in
 the range [0..p-1].  For every possible `p mod 2^118`, there is a possible
-`k[i] mod 2^118` s.t `b[i] = k[i]\*p mod 2^118`.  Therefore, the attacker does
+`k[i] mod 2^118` s.t `b[i] = k[i]*p mod 2^118`.  Therefore, the attacker does
 not directly learn anything about the lower 118 bits of `p`.
 
 Are there more sophisticated attacks that leak some or all of `p`?  Probably.
