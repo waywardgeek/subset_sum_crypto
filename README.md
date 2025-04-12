@@ -12,7 +12,7 @@ where all 128 lower bits are 0.  All the values of v added together are still < 
 Alice then picks random 256-bit r and prime p in the range of 2^256 to 2^257,
 and cmoputes
 
-    b[i] = r*v[i] mod p
+    b[i] = r\*v[i] mod p
 
 For any b[i] > 2^256, Alice picks a new b[i] until all b[i] < 2^256.  The set
 of b[i] is Alice's public key, which is 16KiB.  The values r, v[i], and p are
@@ -41,8 +41,8 @@ guessing p clearly won't be fast enough.
 
 Trying to guess r from the 512 values without knowing p:
 
-    b[0] = r*v[0] + k[0]p -- 2 256-bit unknowns and 1 128-bit unknown (k can be dreived)
-    b[1] = r*v[1] + k[1]p -- An additional 128 bit unknown.
+    b[0] = r\*v[0] + k[0]p -- 2 256-bit unknowns and 1 128-bit unknown (k can be dreived)
+    b[1] = r\*v[1] + k[1]p -- An additional 128 bit unknown.
     ...
 
 Hypothesis: finding r and p from these 512 equations is hard.  Intuition is
@@ -53,13 +53,8 @@ Quantum resistance, assuming BQP != NP: The subsest-sum problem is NP-hard, so
 unless a special version of a quantum algorithm can be found to solve this
 specific case, I think the best we can do is Grover's algorithm.  With Grovers
 algorithm, we want to find r and p that simultaneouisly solves a few of the
-B[i] = r*v[i] mod p constraints.  Both r and p are 256 bits long, so Grovers
+B[i] = r\*v[i] mod p constraints.  Both r and p are 256 bits long, so Grovers
 algorithm would take 2^256 time.
-
-Attacking Bob's subset-sum results in about 2^256 solutions, but only about 1
-in 1^128 are valid in that they select Bob's secret key.  Finding a valid
-solution imay also guessing r and p.  If so, the by Grover's algorithm, we
-still need 2^256 attempts got guess r and p.
 
 There is a year-old paper that claims BQP == NP, which would be a tremendous
 result if true.  In that case, there is no such thing as post-quantum crypto.
