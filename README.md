@@ -111,14 +111,4 @@ element is more than 512 bits is around `O(n/4)`, where `n` is the number of
 elements in the set.  This algorithm makes it strictly harder to find a correct
 subset of elements by shortening values, giving the attacker less information.
 
-Any successful attack will rely on the chosen structure of the `v` values.  For
-i > 128, we have:
-
-```
-    b[i] = r*<10 0's><128 random bits><118 0s> mod p
-or:
-    b[i] = r*<10 0's><128 random bits><118 0s> + k*p
-```
-
-Would a lattice-based attack break this?  If not, what about quantum algorithms?
 I suspect this is where the weakness in the algorithm lies.
