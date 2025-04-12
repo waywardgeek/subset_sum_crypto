@@ -85,3 +85,22 @@ As for the subset-sum problem, the best known general attacks where each
 element is more than 512 bits is around `O(n/4)`, where `n` is the number of
 elements in the set.  This algorithm makes it strictly harder to find a correct
 subset of elements by shortening values, giving the attacker less information.
+
+### Finding `r` and `p`
+
+For any public key `b`, and any chosen `r` and `p` values, there exist `v`
+array values that satisfy `b[i] = r*v[i] mod p`, if we let the `v` values be
+any value in [0..p-1].  Therefore, if v had no constraints on values, the `b`
+array would leak no information about `r` and `p`.
+
+Any successful attack will rely on the chosen structure of the `v` values.  For
+i > 128, we have:
+
+```
+    b[i] = r*<10 0's><118 random bits><128 0s> mod p
+or:
+    b[i] = r*<10 0's><118 random bits><128 0s> + k*p
+```
+
+Would a lattice-based attack break this?  If not, what about quantum algorithms?
+I suspect this is where the weakness in the algorithm lies.
