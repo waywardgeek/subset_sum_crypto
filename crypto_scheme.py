@@ -15,14 +15,14 @@ print(f"p = {p}")
 print(f"r = {r}")
 
 def findVAndB(i):
-    if i < 128:
-        v = (randrange(1 << 118) << 128) | (1 << i)
-    else:
-        v = randrange(1 << 118) << 128
-    b = r*v % p
-    if b < (1 << 256):
-        return (v, b)
-    return findVAndB(i)
+    while True:
+        if i < 128:
+            v = (randrange(1 << 118) << 128) | (1 << i)
+        else:
+            v = randrange(1 << 118) << 128
+        b = r*v % p
+        if b < (1 << 256):
+            return (v, b)
 
 v = []
 b = []

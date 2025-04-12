@@ -1,4 +1,4 @@
-Alice picks 128 values:
+Alice picks 128 values, for i in [0..127]:
 
     v[i] = (randRange(2^118) << 128) | (1 << i)
 
