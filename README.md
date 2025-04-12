@@ -12,7 +12,7 @@ where all 128 lower bits are 0.  All the values of v added together are still < 
 Alice then picks random 256-bit r and prime p in the range of 2^256 to 2^257,
 and cmoputes
 
-    b[i] = r\*v[i] mod p
+    b[i] = r*v[i] mod p
 
 For any b[i] > 2^256, Alice picks a new b[i] until all b[i] < 2^256.  The set
 of b[i] is Alice's public key, which is 16KiB.  The values r, v[i], and p are
@@ -41,8 +41,8 @@ guessing p clearly won't be fast enough.
 
 Trying to guess r from the 512 values without knowing p:
 
-    b[0] = r\*v[0] + k[0]p -- 2 256-bit unknowns and 1 128-bit unknown (k can be dreived)
-    b[1] = r\*v[1] + k[1]p -- An additional 128 bit unknown.
+    b[0] = r*v[0] + k[0]p -- 2 256-bit unknowns and 1 128-bit unknown (k can be dreived)
+    b[1] = r*v[1] + k[1]p -- An additional 128 bit unknown.
     ...
 
 Hypothesis: finding r and p from these 512 equations is hard.  Intuition is
