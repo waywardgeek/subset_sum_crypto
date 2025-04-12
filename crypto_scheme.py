@@ -42,6 +42,7 @@ for i in range(128, 512):
         s += b[i]
 print("Bob returns", s)
 
+# This computes the modular inverse of r mod p.
 rInv = pow(r, -1, p)
 print("rInv =", rInv)
 aliceSecret = ((1 << 128) - 1) & (((s % p) * rInv) % p)
