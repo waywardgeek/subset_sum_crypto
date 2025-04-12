@@ -2,16 +2,6 @@ from random import randrange
 import sympy
 
 def get_random_prime(min_val, max_val):
-  """
-    Selects a random prime number within the range [min_val, max_val].
-
-    Args:
-        min_val: The minimum value of the range.
-        max_val: The maximum value of the range.
-
-    Returns:
-        A random prime number within the specified range, or None if no prime exists in the range.
-  """
   while True:
     num = randrange(min_val, max_val)
     if sympy.isprime(num):
