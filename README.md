@@ -63,17 +63,23 @@ This can be seen as valid noting that `s/r mod p = sum(v[i])`, where the `i`
 values were selected by Bob to encode `sharedSecret`.  This sum is < `p`, so
 the low 128 bits should represent Bob's secret key.
 
+## Security
+
 Is this scheme quantum resistant?  I am unfortunately not skilled in this area,
 but I will hypothesize that it might be.  Someone else would need to determine
 this.
 
 With very many solutions to the subset-sum problem, even a quantum computing
 solution to subset-sum does not break the scheme directly.  The attacker would
-need to find not just the subset, but also `r` and `p` to verify the subset sum
-is correct.  There may be quantum computing algorithms that work more
-efficiently, but the one I know is Grover's Algorithm, which is not fast
-enough, since guessing both `r` and `p` at the same time would take time
-O(2^256).
+need to find not just a subset with the correct sum, but one that also includes
+the correct set of `b[0..127]`.  A successful attack is more likely to derive
+`r` and `p` directly from the `b` array, without relying on Bob's subset sum.
+The linear nature of the equations for the `b` array values may result in
+efficient quantum attacks, or even efficient classical computing attacks.
+
+My intuition for this problem being hard is that without knowing `p`, the
+attacker does not know the group, and linear analysis won't work on an unknown
+group.
 
 As for the subset-sum problem, the best known general attacks where each
 element is more than 512 bits is around `O(n/4)`, where `n` is the number of
