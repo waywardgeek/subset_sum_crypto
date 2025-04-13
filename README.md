@@ -20,7 +20,7 @@ secret prime modulus `p`.
 
 ## The Scheme
 
-Alice starts by picking random secret 256-bit prime `p` in the range
+Alice starts by picking random secret 257-bit prime `p` in the range
 [2^256..2^257], and then computes 118 values `v[i]`, for `i` in [0..117]:
 
 ```
@@ -120,10 +120,11 @@ parameters can be written as:
     b[i4] = r*v[i4] - k[i4]*p
 ```
 
-The main assumption for the security of this system is that solving these
-equations is hard for any subset of equations for `b`.  Just how hard is this?
-If, for example, it is only as hard as DLP, then then we would need p to be
-2047 bits, making this scheme too slow to be of any use.
+The security of this scheme is based on the assumption that solving these
+equations is hard for any subset of equations for `b`.
+
+Just how hard is this?  If, for example, it is only as hard as DLP, then then
+we would need p to be 2047 bits, making this scheme too slow to be of any use.
 
 The `k[i]` values are determined by the others, and are not random.  Each
 equation introduces only 128 unknown bits, but gives us 256 bits of
@@ -177,8 +178,14 @@ algorithm "Secure against Bill".  That's all I know for now.
 Googling for subset-sum cryptography yields hundreds of papers, some which
 claim to prove security of their public-key schemes based on the hardness of
 subset-sum.  My guess is most likely Ralph Merkle invented and broke this
-scheme in the 1980s.  However, most of the papers in this area use known
-prime fields, both in cyrpto schemes and attacks.  Also, they tend to
-work in "low density" versions of the subset-sum problem where Bob's sum has a
-unique subset-sum solution.  There is a non-negligible chance this scheme is
-new.  If so, why?  It is literally the first subset-sum scheme I thought of.
+scheme in the 1980s.  However, most of the papers in this area:
+
+1)  Use known prime fields, where `p` is public.
+2) Rely on the hardness of the subset-sum problem.
+3) Work in work in "low density" versions of the subset-sum problem where Bob's
+   sum has a unique solution.
+
+So, there is a non-negligible chance this scheme is new, mostly because I
+propose a new untested problem for the security of the scheme that is simply
+too hard for me to break, rather than relying on well-known hard problems that
+have been studied for centuries, like subset-sum.
