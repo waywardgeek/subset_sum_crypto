@@ -76,10 +76,6 @@ Alice then computes
 
     sharedSecret = lower118Bits(s/r mod p)
 
-This can be seen as valid noting that `s/r mod p = sum(v[i])`, where the `i`
-values were selected by Bob to encode `sharedSecret`.  This sum is < `p`, so
-the low 118 bits should represent Bob's secret key.
-
 ## Security
 
 As for the subset-sum problem, the best known general attacks where each
