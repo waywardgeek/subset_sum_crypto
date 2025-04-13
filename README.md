@@ -49,7 +49,7 @@ called `r` in [1..p-1], and computes a blinded array `b` for `i` in [0..383]:
 
 For any `b[i]` > 2^256, Alice picks a new `v[i]` until all `b[i]` < 2^256.
 This prevents the `b` values from leaking information about `p`.  The array `b`
-is Alice's public key, which is 16KiB.  The values `r`, `p`, and array `v` are
+is Alice's public key, which is 12KiB.  The values `r`, `p`, and array `v` are
 Alice's private key.
 
 For Bob to send Alice a 118-bit shared secret, he encodes it by summing the
@@ -67,29 +67,36 @@ the low 118 bits should represent Bob's secret key.
 ## Security
 
 As for the subset-sum problem, the best known general attacks where each
-element is more than 512 bits is around `O(n/4)`, where `n` is the number of
-elements in the set.  This algorithm makes it strictly harder to find a correct
-subset of elements by shortening values, giving the attacker less information.
-This results in there being very many solutions to the subset-sum problem.
-There are only N*p possible sums, but there are 2^N subsets.  This means that
-on average, each possible sum has 2^N/N*p collisions.  For N = 384, and p >
-2^128, there are at least 2^118 solutions on average.  Using subset-sum will
-not help the attacker.
+element has enough bits to make subset-sums usually unique run around `O(N/4)`,
+where `N` is the number of elements in the set.  This algorithm makes it
+strictly harder to find a correct subset of elements by shortening values,
+giving the attacker less information.  This results in there being very many
+solutions to the subset-sum problem.  There are only N*p possible sums, but
+there are 2^N subsets.  This means that on average, each possible sum has
+2^N/N*p collisions.  For N = 384, and p > 2^256, there are at least 2^118
+solutions on average.  It is unlikely that using subset-sum will not help the
+attacker, and the attacker is then left only with attacking the public key `b`
+directly.
 
 For any public key `b`, and any attacker-chosen `r'` and `p'` values, there exist
 `v'` array values that satisfy `b[i] = r*v[i] mod p`, if we let the `v'` values
 be any value in [1..p'-1].  Therefore, if v' had no constraints, the `b` array
-would leak no information about `r` and `p`.  Any successful attack must
-take advantage of the special structure of `v`.
+would leak no information about `r` and `p`.  Any successful attack must take
+advantage of the special structure of `v`.  So, for example, no solver for
+Diophantine equations can help the attacker here, as there are 2 more unknowns
+than equations, as each equation introduces a new `v[i]` unknown, and all
+include the unknown `r` and `p` values.
 
-If the attacker takes any 4 b[i] values where i > secretBits (118 in the
-example), there is enouigh information to guess the v[i], k[i], r, and p values, where `k[i]` is the value needed to make:
+However, for the example parameters, the attacker can solve for `r` and `p`
+using any 4 `equations for b[i]`.  There is enough information to guess the
+`v[i]`, `r`, and `p` values, when `k[i]` is the value needed to make:
 
 ```
-    0 <=r*v[i] - k[i]*p < p
+    0 <= b[i] = r*v[i] - k[i]*p < p
 ```
 
-The four simulgtaneous equations can be written as:
+The four simultaneous equations needed to attack our systems with our example
+parameters can be written as:
 
 ```
     b[i1] = r*v[i1] - k[i1]*p
@@ -99,18 +106,20 @@ The four simulgtaneous equations can be written as:
 ```
 
 The main assumption for the security of this system is that solving these
-equations is hard for any subset of `b`.
+equations is hard for any subset of equations for `b`.  Just how hard is this?
+If, for example, it is only as hard as DLP, then then we would need p to be
+2047 bits, making this scheme too slow to be of any use.
 
 The `k[i]` values are determined by the others, and are not random.  Each
 equation introduces only 128 unknown bits, but gives us 256 bits of
-const4raint.  There are a total of 1024 bits known on the left, and 1024
+constraint.  There are a total of 1024 bits known on the left, and 1024
 unknown bits on the right.  Any solution to these equations can be verified by
 testing on one more.
 
 No matter how many of these equations we try to solve simultaneously, there are
 always two more unknown variables than equations.  Otherwise, these would form
 Diophantine equations by adding these together.  Instead, if we think of the
-unknowns as individual boolean variables, we have 1024 unknonw variables, and
+unknowns as individual Boolean variables, we have 1024 unknown variables, and
 1024 equations constraining them, if we write the equation for each bit of the
 `b` values.
 
@@ -132,8 +141,20 @@ k[i]*p mod 2^n`.  Therefore, the attacker does not learn anything about `p mod
 If classically secure, is this scheme quantum resistant?  I am unfortunately
 not skilled in this area.  However, the attacker will most likely need to solve
 the above simultaneous equations to derive `r`, `p`, and `the v` values.  It
-would take experts in quantum crytography to analyze the difficulty of this.
+would take experts in quantum cryptography to analyze the difficulty of this.
 
 However, we do know that direct application of Grover's algorithm to equations
-with 1024 unknown boolean variables is far too slow.  Is there anything like
+with 1024 unknown Boolean variables is far too slow.  Is there anything like
 Shor's algorithm that can work here?
+
+## Conclusion
+
+Cryptography is hard.  In general, if you invent a public key algorithm, then:
+
+1) It is not new: you've just re-invented something old.
+2) It is also insecure.
+
+I have not yet found this algorithm published anywhere.  Most likely this is
+because it was too easy to break, and no one wound up with their name attached
+to it.  That said, can you break it?  I have failed so far, making this
+algorithm "Secure against Bill".  That's all I know for now.
