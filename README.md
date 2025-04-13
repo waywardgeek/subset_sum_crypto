@@ -40,8 +40,8 @@ sum mod `p`.
 
 The main idea for this crypto system is for Alice to publish values based on
 the array `v` as her public key, and for Bob to transmit to Alice a shared
-118-bit key encoded in a subset-sum.  Obviously, simply publishing the array
-`v` is insecure, so we need to somehow obfuscate `v`'s values.
+118-bit shared secret encoded in a subset-sum.  Obviously, simply publishing
+the array `v` is insecure, so we need to somehow obfuscate `v`'s values.
 
 First, let's make the subset-sum problem more interesting, expanding the array
 `v` from 118 elements to 384.  For `i` in [118..383], Alice computes:
