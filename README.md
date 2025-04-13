@@ -4,7 +4,19 @@ Note: you should never use an unproven crypto scheme like this to protect
 sensitive data.  Use standard crypto instead from trustworthy libraries like
 OpenSSL.
 
-That said, inventing new crypto is fun.  Here's my latest brain-fart.
+That said, inventing new crypto is fun.  This scheme is inspired from [Merkle
+Puzzles](https://en.wikipedia.org/wiki/Merkle%27s_Puzzles).  If we want to
+increase the sequrity of the scheme to exponential advantage rather than
+quadratic, then maybe Bob can pick a random subset of puzzles, rather than just
+one, and only Alice can figure out which puzzles Bob chose.  The simplest way
+to combine Bob's subset of chosen puzzles is just to add them.  It turns out
+that deteermining Bob's chosen subset from the sum is hard, and in some cases
+NP-complete, making this a good candidate for a public key cryptography scheme.
+From there, I just used the most obvious way for Alice to determine Bob's
+subset: encode 1 unique bit in each value so that I can read off the subset
+from the binary representation of the sum.  To make it hard for Eve to see this
+binary representation, I just blineded them with a randomk `r` and a random
+prime modulus `p`.
 
 Alice starts by picking random secret 256-bit prime `p` in the range
 [2^256..2^257], and then computes 118 values `v[i]`, for `i` in [0..117]:
@@ -14,7 +26,8 @@ Alice starts by picking random secret 256-bit prime `p` in the range
 ```
 
 Remember that the << operator means shift the bits left.  `1 << i` is the value
-`2^i`.
+`2^i`.  These values, if added together trivially expose which values were
+added.  The chosen values are encoded in the lower bits.
 
 The upper 138 bits start with 10 leading 0's, followed by 128 random bits.  The
 lower 118 bits have only the `i`th bit set.  When any subset of the array `v`
@@ -158,3 +171,12 @@ I have not yet found this algorithm published anywhere.  Most likely this is
 because it was too easy to break, and no one wound up with their name attached
 to it.  That said, can you break it?  I have failed so far, making this
 algorithm "Secure against Bill".  That's all I know for now.
+
+Googling for subset-sum cryptography yields hundreds of papers, some which
+claim to prove security of their public-key schemes based on the hardness of
+subset-sum.  My guess is most likely Ralph Merkle invented and broke this
+scheme in the 1980s.  However, most of the papers in this area use known
+prime fields, both in cyrpto schemes and attacks.  Also, they tend to
+work in "low density" versions of the subset-sum problem where Bob's sum has a
+unique subset-sum solution.  There is a non-negligible chance this scheme is
+new.  If so, why?  It is literally the first subset-sum scheme I thought of.
