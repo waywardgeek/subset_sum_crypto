@@ -1,4 +1,4 @@
-# A new crypto system I just made up.  Is it secure?  Quantum resistant?
+# A (possibly) new crypto system I just made up.
 
 Note: you should never use an unproven crypto scheme like this to protect
 sensitive data.  Use standard crypto instead from trustworthy libraries like
