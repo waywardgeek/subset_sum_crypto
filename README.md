@@ -53,7 +53,7 @@ First, let's make the subset-sum problem more interesting, expanding the array
 These values have 0's for both the leading 10 bits and the lower 118 bits.
 Note that a random subset-sum of `v` encodes only which of the values where
 chosen in `v[0..117]`.  Also, there are very many solutions to the subset-sum
-problem, more than 2^120 when the target `T` is a random subset-sum of `v`.
+problem, more than 2^118 when the target `T` is a random subset-sum of `v`.
 
 To obscure the values of the array `v`, Alice picks a random 257-bit value
 called `r` in [1..p-1], and computes a blinded array `b` for `i` in [0..383]:
