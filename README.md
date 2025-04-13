@@ -137,7 +137,7 @@ No matter how many of these equations we try to solve simultaneously, there are
 always two more unknown variables than equations.  Otherwise, these would form
 a Diophantine system of equations.  Instead, if we think of the unknowns as
 individual Boolean variables, in our example, we have 257 unknown variables for
-`r`, 257 for `p`, and 5*128 for `v`.  The known constraints have 5*256 bits, so
+`r`, 257 for `p`, and 5\*128 for `v`.  The known constraints have 5*256 bits, so
 any solution will be unique with high probability.
 
 It is possible to eliminate `r` and `v[i]` from the set of equations by taking
