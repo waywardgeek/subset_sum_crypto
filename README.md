@@ -70,43 +70,70 @@ As for the subset-sum problem, the best known general attacks where each
 element is more than 512 bits is around `O(n/4)`, where `n` is the number of
 elements in the set.  This algorithm makes it strictly harder to find a correct
 subset of elements by shortening values, giving the attacker less information.
-Attacks directly on Bob's message to Alice are unlikely to work out.  That leaves attacking Alice's public key.
+This results in there being very many solutions to the subset-sum problem.
+There are only N*p possible sums, but there are 2^N subsets.  This means that
+on average, each possible sum has 2^N/N*p collisions.  For N = 384, and p >
+2^128, there are at least 2^118 solutions on average.  Using subset-sum will
+not help the attacker.
 
-For any public key `b`, and any attacker-chosen `r` and `p` values, there exist
-`v` array values that satisfy `b[i] = r*v[i] mod p`, if we let the `v` values
-be any value in [1..p-1].  Therefore, if v had no constraints, the `b` array
+For any public key `b`, and any attacker-chosen `r'` and `p'` values, there exist
+`v'` array values that satisfy `b[i] = r*v[i] mod p`, if we let the `v'` values
+be any value in [1..p'-1].  Therefore, if v' had no constraints, the `b` array
 would leak no information about `r` and `p`.  Any successful attack must
-necessarily take advantage of the special structure of `v`.
+take advantage of the special structure of `v`.
 
-It is, for example possible to eliminate both `r` and `v[i]` from the set of
-equations with some tricks:
+If the attacker takes any 4 b[i] values where i > secretBits (118 in the
+example), there is enouigh information to guess the v[i], k[i], r, and p values, where `k[i]` is the value needed to make:
 
 ```
-    b[i] = r*v[i] mod p = r*v[i] + k[i]*p
-    b[i] mod 2^118 = r*v[i] + k[i]*p mod 2^118
-    b[i] mod 2^118 = k[i]*p mod 2^118
+    0 <=r*v[i] - k[i]*p < p
 ```
 
-Here, `k[i]*p` is a negative value that reduces `r*v[i] + k[i]*p` to be in
-the range [0..p-1].  For every possible `p mod 2^118`, there is a possible
-`k[i] mod 2^118` s.t `b[i] = k[i]*p mod 2^118`.  Therefore, the attacker does
-not learn anything about the lower 118 bits of `p` from just these equations.
+The four simulgtaneous equations can be written as:
 
-The attacker's ability to manipulate these equations while exploiting the
-structure of `v`is limited.  For example, finding linear combinations of `b`
-values equal to 0 leads nowhere.
+```
+    b[i1] = r*v[i1] - k[i1]*p
+    b[i2] = r*v[i2] - k[i2]*p
+    b[i3] = r*v[i3] - k[i3]*p
+    b[i4] = r*v[i4] - k[i4]*p
+```
+
+The main assumption for the security of this system is that solving these
+equations is hard for any subset of `b`.
+
+The `k[i]` values are determined by the others, and are not random.  Each
+equation introduces only 128 unknown bits, but gives us 256 bits of
+const4raint.  There are a total of 1024 bits known on the left, and 1024
+unknown bits on the right.  Any solution to these equations can be verified by
+testing on one more.
+
+No matter how many of these equations we try to solve simultaneously, there are
+always two more unknown variables than equations.  Otherwise, these would form
+Diophantine equations by adding these together.  Instead, if we think of the
+unknowns as individual boolean variables, we have 1024 unknonw variables, and
+1024 equations constraining them, if we write the equation for each bit of the
+`b` values.
+
+It is possible to eliminate both `r` and `v[i]` from the set of equations by
+taking them mod 2^n, where n is the number of trailing 0's in `v` values, in
+our example 118.
+
+```
+    b[i] = r*v[i] - k[i]*p
+    b[i] mod 2^n = -k[i]*p mod 2^n
+```
+
+For every possible `p mod 2^n`, there is a possible `k[i] mod 2^n` s.t `b[i] =
+k[i]*p mod 2^n`.  Therefore, the attacker does not learn anything about `p mod
+2^n` from these equations alone.
+
+## Quantum resistant?
 
 If classically secure, is this scheme quantum resistant?  I am unfortunately
-not skilled in this area, but I will hypothesize that it might be.  Someone
-else would need to determine this.  However, direct attacks on the subset-sum
-problem look unlikely, even for quantum computers.  There are very many
-solutions to the subset-sum, over 2^120, so finding valid solutions does not
-lead to guessing the shared secret efficiently.  A more likely successful
-quantum algorithm would derive `r` and `p` directly from the `b[i]` values.
+not skilled in this area.  However, the attacker will most likely need to solve
+the above simultaneous equations to derive `r`, `p`, and `the v` values.  It
+would take experts in quantum crytography to analyze the difficulty of this.
 
-Grover's algorithm would take around 2^256 attempts to find `r` and `p`, which
-is too slow.
-
-My likely flawed intuition for this problem being quantum resistant is that
-without knowing `p`, the attacker doesn't even know what the group members are,
-complicating mathematical attacks.
+However, we do know that direct application of Grover's algorithm to equations
+with 1024 unknown boolean variables is far too slow.  Is there anything like
+Shor's algorithm that can work here?
