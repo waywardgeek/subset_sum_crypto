@@ -111,10 +111,10 @@ The four simultaneous equations needed to attack our systems with our example
 parameters can be written as:
 
 ```
-    b[i1] = r*v[i1] - k[i1]*p
-    b[i2] = r*v[i2] - k[i2]*p
-    b[i3] = r*v[i3] - k[i3]*p
-    b[i4] = r*v[i4] - k[i4]*p
+    b[i1] = r*v[i1] - k[i1]*p < p
+    b[i2] = r*v[i2] - k[i2]*p < p
+    b[i3] = r*v[i3] - k[i3]*p < p
+    b[i4] = r*v[i4] - k[i4]*p < p
 ```
 
 The security of this scheme is based on the assumption that solving these
