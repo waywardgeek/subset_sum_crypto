@@ -1,15 +1,15 @@
 from random import randrange
 import sympy
 
-def get_random_prime(min_val, max_val):
+def getRandomPrime(minVal, maxVal):
   while True:
-    num = randrange(min_val, max_val)
+    num = randrange(minVal, maxVal)
     if sympy.isprime(num):
       return num
 
-min_range = 1 << 256
-max_range = 1 << 257
-p = get_random_prime(min_range, max_range)
+minRange = 1 << 256
+maxRange = 1 << 257
+p = getRandomPrime(minRange, maxRange)
 r = randrange(1 << 256)
 print("p =", p)
 print("r =", r)
