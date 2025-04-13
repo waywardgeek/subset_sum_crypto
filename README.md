@@ -111,44 +111,50 @@ The four simultaneous equations needed to attack our systems with our example
 parameters can be written as:
 
 ```
-    b[i1] = r*v[i1] - k[i1]*p < p
-    b[i2] = r*v[i2] - k[i2]*p < p
-    b[i3] = r*v[i3] - k[i3]*p < p
-    b[i4] = r*v[i4] - k[i4]*p < p
+    b[i1] = r*v[i1] mod p
+    b[i2] = r*v[i2] mod p
+    b[i3] = r*v[i3] mod p
+    b[i4] = r*v[i4] mod p
+    b[i5] = r*v[i5] mod p
 ```
 
 The security of this scheme is based on the assumption that solving these
-equations is hard for any subset of equations for `b`, when the only known
-values are the `b` values, and even `p` is secret.
+equations is hard for any subset of equations for `b`, when the only public
+values are the `b` values, and both  `r` and `p` are secret.
 
-Just how hard is this?  If, for example, it is only as hard as DLP, then then
-we would need p to be 2047 bits, making this scheme too slow to be of any use.
+It is easy to see that for randomly chosen `v` values in [1..p-1], the scheme
+has information theoretic security, meaning the attacker cannot learn `r` or
+`p` regardless of their computational power.  There is always a value of `v[i]`
+which satisfies the equation for `b[i]`, regardless of the values of `r` and
+prime `p`.
 
-The `k[i]` values are determined by the others, and are not random.  Each
-equation introduces only 128 unknown bits, but gives us 256 bits of
-constraint.  There are a total of 1024 bits known on the left, and 1024
-unknown bits on the right.  Any solution to these equations can be verified by
-testing on one more.
+To actually transmit information from Bob to Alice, Alice must pick `v`
+non-randomly, and the attacker must take advantage of how Alice picked `v` to
+have any chance of success.  This is similar to how attackers take advantage of
+how the `b` values are computed to crack the subset sum problem.
 
 No matter how many of these equations we try to solve simultaneously, there are
 always two more unknown variables than equations.  Otherwise, these would form
-Diophantine equations by adding these together.  Instead, if we think of the
-unknowns as individual Boolean variables, we have 1024 unknown variables, and
-1024 equations constraining them, if we write the equation for each bit of the
-`b` values.
+a Diophantine system of equations.  Instead, if we think of the unknowns as
+individual Boolean variables, in our example, we have 257 unknown variables for
+`r`, 257 for `p`, and 5*128 for `v`.  The known constraints have 5*256 bits, so
+any solution will be unique with high probability.
 
-It is possible to eliminate both `r` and `v[i]` from the set of equations by
-taking them mod 2^n, where n is the number of trailing 0's in `v` values, in
-our example 118.
+It is possible to eliminate `r` and `v[i]` from the set of equations by taking
+them mod 2^n, where n is the number of trailing 0's in `v` values, in our
+example 118.
 
 ```
-    b[i] = r*v[i] - k[i]*p
-    b[i] mod 2^n = -k[i]*p mod 2^n
+    b[i] = r*v[i] - k[i]*p < p
+    b[i] mod 2^n = -k[i]*p mod 2^n < p
 ```
 
 For every possible `p mod 2^n`, there is a possible `k[i] mod 2^n` s.t `b[i] =
 k[i]*p mod 2^n`.  Therefore, the attacker does not learn anything about `p mod
 2^n` from these equations alone.
+
+This is where my math skills fail me.  Are you an expert at cryptanalysis using
+latice-based techniques?
 
 ### Quantum resistant?
 
