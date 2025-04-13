@@ -18,6 +18,8 @@ from the binary representation of the sum.  To make it hard for Eve to see this
 binary representation, I just blinded them with a random secret `r` and a random
 secret prime modulus `p`.
 
+## The Scheme
+
 Alice starts by picking random secret 256-bit prime `p` in the range
 [2^256..2^257], and then computes 118 values `v[i]`, for `i` in [0..117]:
 
@@ -149,7 +151,7 @@ For every possible `p mod 2^n`, there is a possible `k[i] mod 2^n` s.t `b[i] =
 k[i]*p mod 2^n`.  Therefore, the attacker does not learn anything about `p mod
 2^n` from these equations alone.
 
-## Quantum resistant?
+### Quantum resistant?
 
 If classically secure, is this scheme quantum resistant?  I am unfortunately
 not skilled in this area.  However, the attacker will most likely need to solve
