@@ -118,7 +118,8 @@ parameters can be written as:
 ```
 
 The security of this scheme is based on the assumption that solving these
-equations is hard for any subset of equations for `b`.
+equations is hard for any subset of equations for `b`, when the only known
+values are the `b` values.
 
 Just how hard is this?  If, for example, it is only as hard as DLP, then then
 we would need p to be 2047 bits, making this scheme too slow to be of any use.
