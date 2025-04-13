@@ -53,7 +53,8 @@ First, let's make the subset-sum problem more interesting, expanding the array
 These values have 0's for both the leading 10 bits and the lower 118 bits.
 Note that a random subset-sum of `v` encodes only which of the values where
 chosen in `v[0..117]`.  Also, there are very many solutions to the subset-sum
-problem, more than 2^119 when the target `T` is a random subset-sum of `v`.
+problem, more than 2^119 on average when the target `T` is a random subset-sum
+of `v`.
 
 To obscure the values of the array `v`, Alice picks a random 257-bit value
 called `r` in [1..p-1], and computes a blinded array `b` for `i` in [0..383]:
@@ -88,7 +89,7 @@ strictly harder to find a correct subset of elements by shortening values,
 giving the attacker less information.  This results in there being very many
 solutions to the subset-sum problem.  There are only N*p possible sums, but
 there are 2^N subsets.  This means that on average, each possible sum has
-2^N/N*p collisions.  For N = 384, and p > 2^256, there are at least 2^119
+e^N/N*p collisions.  For N = 384, and p > 2^256, there are at least 2^119
 solutions on average.  It is unlikely that using subset-sum will not help the
 attacker, and the attacker is then left only with attacking the public key `b`
 directly.
