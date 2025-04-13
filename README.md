@@ -4,6 +4,8 @@ Note: you should never use an unproven crypto scheme like this to protect
 sensitive data.  Use standard crypto instead from trustworthy libraries like
 OpenSSL instead.
 
+That said, inventing new crypto is fun.  Here's my latest brain-fart.
+
 Alice starts by picking random secret 256-bit prime `p` in the range
 [2^256..2^257], and then computes 118 values `v[i]`, for `i` in [0..117]:
 
@@ -27,7 +29,7 @@ the array `v` as her public key, and for Bob to transmit to Alice a shared
 `v` is insecure, so we need to somehow obfuscate `v`'s values.
 
 First, let's make the subset-sum problem more interesting, expanding the array
-`v` from 118 elements to 512.  For `i` in [118..511], Alice computes:
+`v` from 118 elements to 384.  For `i` in [118..383], Alice computes:
 
 ```
     v[i] = randrange(2^128) << 118
@@ -36,10 +38,10 @@ First, let's make the subset-sum problem more interesting, expanding the array
 These values have 0's for both the leading 10 bits and the lower 118 bits.
 Note that a random subset-sum of `v` encodes only which of the values where
 chosen in `v[0..117]`.  Also, there are very many solutions to the subset-sum
-problem, around 2^256 when the target `T` is a random subset-sum of `v`.
+problem, more than 2^120 when the target `T` is a random subset-sum of `v`.
 
 To obscure the values of the array `v`, Alice picks a random 257-bit value
-called `r` in [1..p-1], and computes a blinded array `b` for `i` in [0..511]:
+called `r` in [1..p-1], and computes a blinded array `b` for `i` in [0..383]:
 
 ```
     b[i] = r*v[i] mod p
@@ -52,7 +54,7 @@ Alice's private key.
 
 For Bob to send Alice a 118-bit shared secret, he encodes it by summing the
 corresponding values in `b[0..117]`, and obfuscates the sum by picking randomly
-elements from `b[118..511]`.  Bob sends the resulting sum `s` to Alice.
+elements from `b[118..383]`.  Bob sends the resulting sum `s` to Alice.
 
 Alice then computes
 
