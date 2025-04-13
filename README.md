@@ -80,38 +80,26 @@ It is, for example possible to eliminate both `r` and `v[i]` from the set of
 equations with some tricks:
 
 ```
-    r*v[i] mod p = (r/(2^118))*(2^118*v[i] mod p
-```
-
-What this dues is let us define `r' = r/(2^118)`, and `v'[i] = v[i]/2^118.
-Note that the upper 118 bits of v'[i] are 0 when i > 118.  For i in [116..511]:
-
-```
-    b[i] = r'*v'[i] mod p = r'*v'[i] + k[i]*p
-    b[i] mod 2^118 = r'*v'[i] + k[i]*p mod 2^118
+    b[i] = r*v[i] mod p = r*v[i] + k[i]*p
+    b[i] mod 2^118 = r*v[i] + k[i]*p mod 2^118
     b[i] mod 2^118 = k[i]*p mod 2^118
 ```
 
-Here, `k[i]*p` is a negative value that reduces `r'*v'[i] + k[i]*p` to be in
+Here, `k[i]*p` is a negative value that reduces `r*v[i] + k[i]*p` to be in
 the range [0..p-1].  For every possible `p mod 2^118`, there is a possible
 `k[i] mod 2^118` s.t `b[i] = k[i]*p mod 2^118`.  Therefore, the attacker does
 not learn anything about the lower 118 bits of `p` from just these equations.
 
 The attacker's ability to manipulate these equations while exploiting the
-structure of `v`is limited.  For example, linear combinations of the `b` values
-does not involve special structure of the `v` values and cannot lead to a
-successful attack.  For example, finding linear combinations of `b` values
-equal to 0 leads nowhere.  The main structure of `v` values is that there are 118 0 bits when `i` is > 118.  The leading 10 0's is also significant.
-
-There are enough unknown bits that learning `r` and `p` directly from `b`
-requires at least 4 values of `b`.
+structure of `v`is limited.  For example, finding linear combinations of `b`
+values equal to 0 leads nowhere.
 
 If classically secure, is this scheme quantum resistant?  I am unfortunately
 not skilled in this area, but I will hypothesize that it might be.  Someone
 else would need to determine this.  However, direct attacks on the subset-sum
 problem look unlikely, even for quantum computers.  There are very many
-solutions to the subset-sum, around 2^256, so having many valid solutions does
-not lead to guessing the shared secret efficiently.  A more likely successful
+solutions to the subset-sum, over 2^120, so finding valid solutions does not
+lead to guessing the shared secret efficiently.  A more likely successful
 quantum algorithm would derive `r` and `p` directly from the `b[i]` values.
 
 Grover's algorithm would take around 2^256 attempts to find `r` and `p`, which
@@ -119,4 +107,4 @@ is too slow.
 
 My likely flawed intuition for this problem being quantum resistant is that
 without knowing `p`, the attacker doesn't even know what the group members are,
-complicating attacks.
+complicating mathematical attacks.
