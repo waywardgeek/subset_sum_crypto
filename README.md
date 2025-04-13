@@ -6,17 +6,17 @@ OpenSSL.
 
 That said, inventing new crypto is fun.  This scheme is inspired from [Merkle
 Puzzles](https://en.wikipedia.org/wiki/Merkle%27s_Puzzles).  If we want to
-increase the sequrity of the scheme to exponential advantage rather than
+increase the security of the scheme to exponential advantage rather than
 quadratic, then maybe Bob can pick a random subset of puzzles, rather than just
 one, and only Alice can figure out which puzzles Bob chose.  The simplest way
 to combine Bob's subset of chosen puzzles is just to add them.  It turns out
-that deteermining Bob's chosen subset from the sum is hard, and in some cases
+that determining Bob's chosen subset from the sum is hard, and in some cases
 NP-complete, making this a good candidate for a public key cryptography scheme.
 From there, I just used the most obvious way for Alice to determine Bob's
 subset: encode 1 unique bit in each value so that I can read off the subset
 from the binary representation of the sum.  To make it hard for Eve to see this
-binary representation, I just blineded them with a randomk `r` and a random
-prime modulus `p`.
+binary representation, I just blinded them with a random secret `r` and a random
+secret prime modulus `p`.
 
 Alice starts by picking random secret 256-bit prime `p` in the range
 [2^256..2^257], and then computes 118 values `v[i]`, for `i` in [0..117]:
