@@ -190,7 +190,7 @@ scheme in the 1980s.  However, most of the papers in this area:
    sum has a unique solution.
 
 So, there is a non-negligible chance this scheme is new, probably because I
-propose a new untested problem as the basis fore security.  We usually prefer
+propose a new untested problem as the basis for security.  We usually prefer
 famous problems that have been studied for centuries.
 
 Because the keys are so large, there is no reason to investigate this scheme
