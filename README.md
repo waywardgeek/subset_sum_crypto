@@ -2,7 +2,7 @@
 
 Note: you should never use an unproven crypto scheme like this to protect
 sensitive data.  Use standard crypto instead from trustworthy libraries like
-OpenSSL instead.
+OpenSSL.
 
 That said, inventing new crypto is fun.  Here's my latest brain-fart.
 
