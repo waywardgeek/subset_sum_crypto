@@ -26,7 +26,7 @@ def findVAndB(i):
 
 v = []
 b = []
-for i in range(512):
+for i in range(384):
     pair = findVAndB(i)
     v.append(pair[0])
     b.append(pair[1])
@@ -37,7 +37,7 @@ s = 0
 for i in range(118):
     if (bobSecret >> i) & 1 == 1:
         s += b[i]
-for i in range(118, 512):
+for i in range(118, 384):
     if randrange(2) == 1:
         s += b[i]
 print("Bob returns", s)
