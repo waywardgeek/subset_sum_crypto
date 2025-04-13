@@ -189,7 +189,9 @@ scheme in the 1980s.  However, most of the papers in this area:
 3) Work in work in "low density" versions of the subset-sum problem where Bob's
    sum has a unique solution.
 
-So, there is a non-negligible chance this scheme is new, mostly because I
-propose a new untested problem for the security of the scheme that is simply
-too hard for me to break, rather than relying on well-known hard problems that
-have been studied for centuries, like subset-sum.
+So, there is a non-negligible chance this scheme is new, probably because I
+propose a new untested problem as the basis fore security.  We usually prefer
+famous problems that have been studied for centuries.
+
+Because the keys are so large, there is no reason to investigate this scheme
+further, other than for the possibility that it may be quantum-resistant.
