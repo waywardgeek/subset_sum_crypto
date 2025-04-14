@@ -2,10 +2,10 @@ from random import randrange
 import sympy
 
 def getRandomPrime(minVal, maxVal):
-  while True:
     num = randrange(minVal, maxVal)
-    if sympy.isprime(num):
-      return num
+    while not sympy.isprime(num):
+        num += 1
+    return num
 
 minRange = 1 << 256
 maxRange = 1 << 257

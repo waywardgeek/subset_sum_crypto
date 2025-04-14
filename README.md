@@ -156,6 +156,12 @@ k[i]*p mod 2^n`.  Therefore, the attacker does not learn anything about `p mod
 This is where my math skills fail me.  Are you an expert at cryptanalysis using
 latice-based techniques?
 
+Just as a sanity check, I verified that the `b` values output by this scheme
+pass the dieharder tests.  "Passing" nowadays means getting roughly the
+expected number o "weak" results, and it fell in between the results of two
+runs on the output of /dev/urandom.  It would be concerning if the public keys
+did not pass basic tests for randomness.
+
 ### Quantum resistant?
 
 If classically secure, is this scheme quantum resistant?  I am unfortunately
