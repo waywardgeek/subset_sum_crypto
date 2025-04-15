@@ -21,22 +21,22 @@ secret prime modulus `p`.
 ## The Scheme
 
 Alice starts by picking random secret 257-bit prime `p` in the range
-[2^256..2^257], and then computes 118 values `v[i]`, for `i` in [0..117]:
+[2^384..2^385], and then computes 118 values `v_i`, for `i` in [0..117]:
 
 ```
-    v[i] = (randrange(2^128) << 118) | (1 << i)
+    v_i = randrange(2^256) | (1 << (i + 266))
 ```
 
 Remember that the << operator means shift the bits left.  `1 << i` is the value
-`2^i`.  These values, if added together trivially expose which values were
-added.  The chosen values are encoded in the lower bits.
+`2^i`.
 
-The upper 138 bits start with 10 leading 0's, followed by 128 random bits.  The
-lower 118 bits have only the `i`th bit set.  When any subset of the array `v`
-are added together, the lower 118 bits encode which elements of `v` were
-chosen, making the subset-sum problem trivial.  Just to make it easier, note
-that all of these values added together are < `p`, so we can compute the same
-sum mod `p`.
+The format of v is 118 bits with only 1 bit set, followed by 10 0's, followed
+by 256 random bits.  The upper 118 bits have only 1 bit set.  When any subset
+of the array `v` are added together, the upper 118 bits encode which elements
+of `v` were chosen, making the subset-sum problem trivial.  Just to make it
+easier, note that all of these values added together are < `p`, so we can
+compute the same sum mod `p`.  The 10 0 bits from position 256 to 265 ensure
+that subset sums do not have the lower 256 bits impacting the upper 118 bits.
 
 The main idea for this crypto system is for Alice to publish values based on
 the array `v` as her public key, and for Bob to transmit to Alice a shared
@@ -44,37 +44,38 @@ the array `v` as her public key, and for Bob to transmit to Alice a shared
 the array `v` is insecure, so we need to somehow obfuscate `v`'s values.
 
 First, let's make the subset-sum problem more interesting, expanding the array
-`v` from 118 elements to 384.  For `i` in [118..383], Alice computes:
+`v` from 118 elements to 512.  For `i` in [118..511], Alice computes:
 
 ```
-    v[i] = randrange(2^128) << 118
+    v_i = randrange(2^256)
 ```
 
-These values have 0's for both the leading 10 bits and the lower 118 bits.
-Note that a random subset-sum of `v` encodes only which of the values where
-chosen in `v[0..117]`.  Also, there are very many solutions to the subset-sum
-problem, more than 2^119 on average when the target `T` is a random subset-sum
-of `v`.
+These values have 0's for the leading 128 bits.  Note that a random subset-sum
+of `v` encodes only which of the values where chosen in `v[0..117]`.  Also,
+there are very many solutions to the subset-sum problem, more than 2^119 on
+average when the target `T` is a random subset-sum of `v`.
 
-To obscure the values of the array `v`, Alice picks a random 257-bit value
-called `r` in [1..p-1], and computes a blinded array `b` for `i` in [0..383]:
+To obscure the values of the array `v`, Alice picks a random 385-bit value
+called `r` in [1..p-1], and computes a blinded array `b` for `i` in [0..511]:
 
 ```
-    b[i] = r*v[i] mod p
+    b_i = r*v_i mod p
 ```
 
-For any `b[i]` > 2^256, Alice picks a new `v[i]` until all `b[i]` < 2^256.
-This prevents the `b` values from leaking information about `p`.  The array `b`
-is Alice's public key, which is 12KiB.  The values `r`, `p`, and array `v` are
-Alice's private key.
+For any `b_i` >= 2^384, Alice picks a new `v_i` randomly as before, until all
+`b_i` < 2^384.  This prevents the `b` values from leaking information about
+`p`.  The array `b` is Alice's public key, which is 24KiB.  The values `r`,
+`p`, and array `v` are Alice's private key.
 
 For Bob to send Alice a 118-bit shared secret, he encodes it by summing the
 corresponding values in `b[0..117]`, and obfuscates the sum by picking randomly
-elements from `b[118..383]`.  Bob sends the resulting sum `s` to Alice.
+elements from `b[118..511]`.  Bob sends the resulting sum `s` to Alice.
 
 Alice then computes
 
-    sharedSecret = lower118Bits(s/r mod p)
+    sharedSecret = (s/r mod p) >> 266
+
+Note that the >> operator shifts right, dropping the lower bits.
 
 ## Security
 
@@ -85,38 +86,45 @@ strictly harder to find a correct subset of elements by shortening values,
 giving the attacker less information.  This results in there being very many
 solutions to the subset-sum problem.  There are only N*p possible sums, but
 there are 2^N subsets.  This means that on average, each possible sum has
-e^N/N*p collisions.  For N = 384, and p > 2^256, there are at least 2^119
+2^N/(N*p) collisions.  For N = 512, and p > 2^384, there are at least 2^119
 solutions on average.  It is unlikely that using subset-sum will not help the
 attacker, and the attacker is then left only with attacking the public key `b`
 directly.
 
 For any public key `b`, and any attacker-chosen `r'` and `p'` values, there exist
-`v'` array values that satisfy `b[i] = r*v[i] mod p`, if we let the `v'` values
+`v'` array values that satisfy `b_i = r*v_i mod p`, if we let the `v'` values
 be any value in [1..p'-1].  Therefore, if v' had no constraints, the `b` array
 would leak no information about `r` and `p`.  Any successful attack must take
 advantage of the special structure of `v`.  So, for example, no solver for
 Diophantine equations can help the attacker here, as there are 2 more unknowns
-than equations, as each equation introduces a new `v[i]` unknown, and all
+than equations, as each equation introduces a new `v_i` unknown, and all
 include the unknown `r` and `p` values.
 
 However, for the example parameters, the attacker can solve for `r` and `p`
-using any 4 `equations for b[i]`.  There is enough information to guess the
-`v[i]`, `r`, and `p` values, when `k[i]` is the value needed to make:
+using any 6 `equations for b_i`.  There is enough information to guess the
+`v_i`, `r`, and `p` values, when `k_i` is the value needed to make:
 
 ```
-    0 <= b[i] = r*v[i] - k[i]*p < p
+    0 <= b_i = r*v_i - k_i*p < p
 ```
 
-The four simultaneous equations needed to attack our systems with our example
+The 6 simultaneous equations needed to attack our systems with our example
 parameters can be written as:
 
 ```
-    b[i1] = r*v[i1] mod p
-    b[i2] = r*v[i2] mod p
-    b[i3] = r*v[i3] mod p
-    b[i4] = r*v[i4] mod p
-    b[i5] = r*v[i5] mod p
+    b_i1 = r*v_i1 mod p
+    b_i2 = r*v_i2 mod p
+    b_i3 = r*v_i3 mod p
+    b_i4 = r*v_i4 mod p
+    b_i5 = r*v_i5 mod p
+    b_i6 = r*v_i6 mod p
 ```
+
+Each equation introduces 384 Boolean constraints if we consider the `b` values
+as 384 Boolean equations.  Each `v` value introduces 256 unknown Boolean
+values.  r has 385 unknown bits, and p has 383, since we know the leading and
+trailing bits of p are 1.  6 equations gives us 2 more Boolean constraints than
+we have unknown Boolean variables.
 
 The security of this scheme is based on the assumption that solving these
 equations is hard for any subset of equations for `b`, when the only public
@@ -124,37 +132,73 @@ values are the `b` values, and both  `r` and `p` are secret.
 
 It is easy to see that for randomly chosen `v` values in [1..p-1], the scheme
 has information theoretic security, meaning the attacker cannot learn `r` or
-`p` regardless of their computational power.  There is always a value of `v[i]`
-which satisfies the equation for `b[i]`, regardless of the values of `r` and
+`p` regardless of their computational power.  There is always a value of `v_i`
+which satisfies the equation for `b_i`, regardless of the values of `r` and
 prime `p`.
 
 To actually transmit information from Bob to Alice, Alice must pick `v`
 non-randomly, and the attacker must take advantage of how Alice picked `v` to
-have any chance of success.  This is similar to how attackers take advantage of
-how the `b` values are computed to crack the subset sum problem.
+have any chance of attacking Alice's public key.
 
 No matter how many of these equations we try to solve simultaneously, there are
 always two more unknown variables than equations.  Otherwise, these would form
 a Diophantine system of equations.  Instead, if we think of the unknowns as
-individual Boolean variables, in our example, we have 257 unknown variables for
-`r`, 257 for `p`, and 5\*128 for `v`.  The known constraints have 5*256 bits, so
-any solution will be unique with high probability.
+individual Boolean variables, in our example, we have 385 unknown variables for
+`r`, 383 for `p`, and 6\*256 for `v`.  The constraints have 6*384 bits.  so a
+solution may be unique, and if not, solutions can be tested against the other
+equations for `b`.
 
-It is possible to eliminate `r` and `v[i]` from the set of equations by taking
-them mod 2^n, where n is the number of trailing 0's in `v` values, in our
-example 118.
+It is possible to eliminate `r` and `v_i` from the set of equations by taking
+them mod 2^n, where n is the number of leading 0's in `v` values, in our
+example 128.
 
 ```
-    b[i] = r*v[i] - k[i]*p < p
-    b[i] mod 2^n = -k[i]*p mod 2^n < p
+    v' = v*2^n, where n == 128 in our example.
+    r' = r/2^n mod p
 ```
 
-For every possible `p mod 2^n`, there is a possible `k[i] mod 2^n` s.t `b[i] =
-k[i]*p mod 2^n`.  Therefore, the attacker does not learn anything about `p mod
-2^n` from these equations alone.
+Then we can find:
 
-This is where my math skills fail me.  Are you an expert at cryptanalysis using
-latice-based techniques?
+```
+    b_i = r'*v'_i - k_i*p < p
+    b_i = -k_i*p mod 2^n
+```
+
+For every possible `p mod 2^n`, there is a possible `k_i mod 2^n` s.t `b_i =
+k_i*p mod 2^n`.  Therefore, the attacker does not learn anything about `p` or
+`k` directly from these equations alone.
+
+Gemini 2.5 gave the following insight.  For any `i, j > 118`, `v_i` and `v_j`
+are small, only 256 bits.  We have:
+
+```
+    b_i = r*v_i - k_i*p
+    b_j = r*v_j - k_j*p
+```
+Now multiply the first by `v_j` and the second by `v_i`:
+
+```
+    b_i*v_j = r*v_i*v_j - k_i*p*v_j
+    b_j*v_i = r*v_j*v_i - k_j*p*v_i
+```
+
+Subtracting gives:
+
+
+```
+    b_i*v_j - b_j*v_i = p*(k_j*v_i - k_i*v_j)
+```
+
+Which means the left side is 0 mod p.  For 6 values of `b_i`, we get 36
+equations of the form:
+
+```
+    b_i*v_j - b_j*v_i = 0 mod p
+```
+
+Does his help mount a latice-based attack that can reveal `p`?
+
+This is where my math skills fail me.
 
 Just as a sanity check, I verified that the `b` values output by this scheme
 pass the dieharder tests.  "Passing" nowadays means getting roughly the
@@ -169,9 +213,8 @@ not skilled in this area.  However, the attacker will most likely need to solve
 the above simultaneous equations to derive `r`, `p`, and `the v` values.  It
 would take experts in quantum cryptography to analyze the difficulty of this.
 
-However, we do know that direct application of Grover's algorithm to equations
-with 1024 unknown Boolean variables is far too slow.  Is there anything like
-Shor's algorithm that can work here?
+However, we do know that direct application of Grover's algorithm to find `r`,
+`p`, and `v_i` values would be too slow.
 
 ## Conclusion
 
