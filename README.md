@@ -4,12 +4,20 @@ Note: you should never use an unproven crypto scheme like this to protect
 sensitive data.  Use standard crypto instead from trustworthy libraries like
 OpenSSL.
 
-#* Broken in 1981
+## Broken in 1981
 It turns out this scheme is nearly the same as Merkle's original knapsack based
 crypto, which was broken by Shamir in 1981.  Diffie, Hellman, and Merkle
 shortly after the knapsack sysstem, invented the Diffie-Hellman system, which
 should probably also include Merkle.  I'll leave this insuecure protocol
 description here.
+
+Even variants I also came up with, such as the multiply-iterated Merkle-Hellman
+system have been broken.
+
+As usual, when you come up with a "new" public key crypto scheme, it is:
+
+1) Actually very old.
+2) Already broken.
 
 ## Motivation
 That said, inventing new crypto is fun.  This scheme is inspired from [Merkle
@@ -25,6 +33,9 @@ subset: encode 1 unique bit in each value so that I can read off the subset
 from the binary representation of the sum.  To make it hard for Eve to see this
 binary representation, I just blinded them with a random secret `r` and a random
 secret prime modulus `p`.
+
+I'm sure this is how Merkle came up with almost the exact same scheme in the
+late 1970s...
 
 ## The Scheme
 
