@@ -4,6 +4,14 @@ Note: you should never use an unproven crypto scheme like this to protect
 sensitive data.  Use standard crypto instead from trustworthy libraries like
 OpenSSL.
 
+#* Broken in 1981
+It turns out this scheme is nearly the same as Merkle's original knapsack based
+crypto, which was broken by Shamir in 1981.  Diffie, Hellman, and Merkle
+shortly after the knapsack sysstem, invented the Diffie-Hellman system, which
+should probably also include Merkle.  I'll leave this insuecure protocol
+description here.
+
+## Motivation
 That said, inventing new crypto is fun.  This scheme is inspired from [Merkle
 Puzzles](https://en.wikipedia.org/wiki/Merkle%27s_Puzzles).  If we want to
 increase the security of the scheme to exponential advantage rather than
